@@ -76,9 +76,26 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
     ) {
         val views = RemoteViews(context.packageName, R.layout.weather_widget)
 
-        // Update temperature and conditions
-        views.setTextViewText(R.id.temperature_text, "${weatherData.temperature.toInt()}°F")
-        views.setTextViewText(R.id.conditions_text, WeatherService.getWeatherDescription(weatherData.weatherCode))
+        // Create bitmaps with custom font
+        val tempText = "${weatherData.temperature.toInt()}°F"
+        val conditionsText = WeatherService.getWeatherDescription(weatherData.weatherCode)
+
+        val tempBitmap = TextBitmapHelper.createTextBitmap(
+            context,
+            tempText,
+            72f, // 24sp * 3 (approx dp to px)
+            android.graphics.Color.WHITE
+        )
+
+        val conditionsBitmap = TextBitmapHelper.createTextBitmap(
+            context,
+            conditionsText,
+            36f, // 12sp * 3 (approx dp to px)
+            android.graphics.Color.WHITE
+        )
+
+        views.setImageViewBitmap(R.id.temperature_text, tempBitmap)
+        views.setImageViewBitmap(R.id.conditions_text, conditionsBitmap)
 
         // Set up click listener to open Google Weather
         val pendingIntent = createGoogleWeatherIntent(context, location)
@@ -95,8 +112,23 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
     ) {
         val views = RemoteViews(context.packageName, R.layout.weather_widget)
 
-        views.setTextViewText(R.id.temperature_text, "Error")
-        views.setTextViewText(R.id.conditions_text, errorMessage)
+        // Create error bitmaps with custom font
+        val errorBitmap = TextBitmapHelper.createTextBitmap(
+            context,
+            "Error",
+            72f,
+            android.graphics.Color.WHITE
+        )
+
+        val messageBitmap = TextBitmapHelper.createTextBitmap(
+            context,
+            errorMessage,
+            36f,
+            android.graphics.Color.WHITE
+        )
+
+        views.setImageViewBitmap(R.id.temperature_text, errorBitmap)
+        views.setImageViewBitmap(R.id.conditions_text, messageBitmap)
 
         // Try to get saved location, or use default
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
