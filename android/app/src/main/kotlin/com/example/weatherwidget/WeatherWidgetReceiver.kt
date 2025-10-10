@@ -1,38 +1,58 @@
 package com.example.weatherwidget
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.widget.RemoteViews
-import android.app.PendingIntent
-import android.content.ComponentName
-import android.content.Intent
-import android.content.SharedPreferences
-import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class WeatherWidgetReceiver : AppWidgetProvider() {
     override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetIds: IntArray
     ) {
-        Log.d(TAG, "onUpdate called for ${appWidgetIds.size} widgets - fetching weather automatically")
+        Log.d(
+                TAG,
+                "onUpdate called for ${appWidgetIds.size} widgets - fetching weather automatically"
+        )
 
         // Fetch weather for all widgets automatically
         fetchAndUpdateWeather(context, appWidgetManager, appWidgetIds)
     }
 
     private fun fetchAndUpdateWeather(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetIds: IntArray
     ) {
         CoroutineScope(Dispatchers.Main).launch {
-            val location = LocationService.getCurrentLocation(context)
+            // First, try to get saved location (set by user in app)
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val savedLat = prefs.getFloat(PREF_LAST_LAT, Float.NaN)
+            val savedLon = prefs.getFloat(PREF_LAST_LON, Float.NaN)
+
+            var location: Coordinates? = null
+
+            // Use saved location if available
+            if (!savedLat.isNaN() && !savedLon.isNaN()) {
+                location = Coordinates(savedLat.toDouble(), savedLon.toDouble())
+                Log.d(TAG, "Using saved location: ${location.latitude}, ${location.longitude}")
+            } else {
+                // Fall back to GPS location if no saved location
+                location = LocationService.getCurrentLocation(context)
+                if (location != null) {
+                    Log.d(TAG, "Got GPS location: ${location.latitude}, ${location.longitude}")
+                    // Save this GPS location for future use
+                    saveLocation(context, location)
+                }
+            }
 
             if (location == null) {
                 Log.e(TAG, "Failed to get location")
@@ -43,19 +63,23 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
                 return@launch
             }
 
-            Log.d(TAG, "Got location: ${location.latitude}, ${location.longitude}")
-
-            // Save location for opening Google Weather later
-            saveLocation(context, location)
-
             val weatherData = WeatherService.fetchWeather(location.latitude, location.longitude)
 
             if (weatherData != null) {
-                Log.d(TAG, "Weather fetched: ${weatherData.temperature}°F, ${WeatherService.getWeatherDescription(weatherData.weatherCode)}")
+                Log.d(
+                        TAG,
+                        "Weather fetched: ${weatherData.temperature}°F, ${WeatherService.getWeatherDescription(weatherData.weatherCode)}"
+                )
 
                 // Update all widgets
                 for (appWidgetId in appWidgetIds) {
-                    updateWidgetWithWeather(context, appWidgetManager, appWidgetId, weatherData, location)
+                    updateWidgetWithWeather(
+                            context,
+                            appWidgetManager,
+                            appWidgetId,
+                            weatherData,
+                            location
+                    )
                 }
             } else {
                 Log.e(TAG, "Failed to fetch weather")
@@ -68,11 +92,11 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
     }
 
     private fun updateWidgetWithWeather(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetId: Int,
-        weatherData: WeatherData,
-        location: Coordinates
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetId: Int,
+            weatherData: WeatherData,
+            location: Coordinates
     ) {
         val views = RemoteViews(context.packageName, R.layout.weather_widget)
 
@@ -80,19 +104,21 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
         val tempText = "${weatherData.temperature.toInt()}°F"
         val conditionsText = WeatherService.getWeatherDescription(weatherData.weatherCode)
 
-        val tempBitmap = TextBitmapHelper.createTextBitmap(
-            context,
-            tempText,
-            72f, // 24sp * 3 (approx dp to px)
-            android.graphics.Color.WHITE
-        )
+        val tempBitmap =
+                TextBitmapHelper.createTextBitmap(
+                        context,
+                        tempText,
+                        72f, // 24sp * 3 (approx dp to px)
+                        android.graphics.Color.WHITE
+                )
 
-        val conditionsBitmap = TextBitmapHelper.createTextBitmap(
-            context,
-            conditionsText,
-            36f, // 12sp * 3 (approx dp to px)
-            android.graphics.Color.WHITE
-        )
+        val conditionsBitmap =
+                TextBitmapHelper.createTextBitmap(
+                        context,
+                        conditionsText,
+                        36f, // 12sp * 3 (approx dp to px)
+                        android.graphics.Color.WHITE
+                )
 
         views.setImageViewBitmap(R.id.temperature_text, tempBitmap)
         views.setImageViewBitmap(R.id.conditions_text, conditionsBitmap)
@@ -105,27 +131,29 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
     }
 
     private fun updateWidgetWithError(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetId: Int,
-        errorMessage: String
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetId: Int,
+            errorMessage: String
     ) {
         val views = RemoteViews(context.packageName, R.layout.weather_widget)
 
         // Create error bitmaps with custom font
-        val errorBitmap = TextBitmapHelper.createTextBitmap(
-            context,
-            "Error",
-            72f,
-            android.graphics.Color.WHITE
-        )
+        val errorBitmap =
+                TextBitmapHelper.createTextBitmap(
+                        context,
+                        "Error",
+                        72f,
+                        android.graphics.Color.WHITE
+                )
 
-        val messageBitmap = TextBitmapHelper.createTextBitmap(
-            context,
-            errorMessage,
-            36f,
-            android.graphics.Color.WHITE
-        )
+        val messageBitmap =
+                TextBitmapHelper.createTextBitmap(
+                        context,
+                        errorMessage,
+                        36f,
+                        android.graphics.Color.WHITE
+                )
 
         views.setImageViewBitmap(R.id.temperature_text, errorBitmap)
         views.setImageViewBitmap(R.id.conditions_text, messageBitmap)
@@ -135,17 +163,19 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
         val lat = prefs.getFloat(PREF_LAST_LAT, 0f).toDouble()
         val lon = prefs.getFloat(PREF_LAST_LON, 0f).toDouble()
 
-        val location = if (lat != 0.0 && lon != 0.0) {
-            Coordinates(lat, lon)
-        } else {
-            null
-        }
+        val location =
+                if (lat != 0.0 && lon != 0.0) {
+                    Coordinates(lat, lon)
+                } else {
+                    null
+                }
 
-        val pendingIntent = if (location != null) {
-            createGoogleWeatherIntent(context, location)
-        } else {
-            createGoogleWeatherIntent(context, null)
-        }
+        val pendingIntent =
+                if (location != null) {
+                    createGoogleWeatherIntent(context, location)
+                } else {
+                    createGoogleWeatherIntent(context, null)
+                }
 
         views.setOnClickPendingIntent(R.id.widget_container, pendingIntent)
 
@@ -154,25 +184,27 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
 
     private fun createGoogleWeatherIntent(context: Context, location: Coordinates?): PendingIntent {
         // Try to open Google Weather app
-        val intent = Intent().apply {
-            component = ComponentName(
-                "com.google.android.googlequicksearchbox",
-                "com.google.android.apps.search.weather.WeatherExportedActivity"
-            )
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        val intent =
+                Intent().apply {
+                    component =
+                            ComponentName(
+                                    "com.google.android.googlequicksearchbox",
+                                    "com.google.android.apps.search.weather.WeatherExportedActivity"
+                            )
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
-            // If we have location, try to pass it (though Google Weather may not use it)
-            location?.let {
-                putExtra("latitude", it.latitude)
-                putExtra("longitude", it.longitude)
-            }
-        }
+                    // If we have location, try to pass it (though Google Weather may not use it)
+                    location?.let {
+                        putExtra("latitude", it.latitude)
+                        putExtra("longitude", it.longitude)
+                    }
+                }
 
         return PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 
