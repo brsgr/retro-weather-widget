@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'location_picker_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -292,6 +293,55 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> _searchLocation() async {
+    final result = await Navigator.of(context).push<Map<String, dynamic>>(
+      MaterialPageRoute(builder: (context) => const LocationPickerScreen()),
+    );
+
+    if (result == null) return;
+
+    final latitude = result['latitude'] as double?;
+    final longitude = result['longitude'] as double?;
+    final name = result['name'] as String?;
+
+    if (latitude == null || longitude == null) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      // Update the text fields
+      _latController.text = latitude.toStringAsFixed(6);
+      _lonController.text = longitude.toStringAsFixed(6);
+
+      // Save the location
+      final platformResult = await platform.invokeMethod('setLocation', {
+        'latitude': latitude,
+        'longitude': longitude,
+      });
+
+      setState(() {
+        _latitude = platformResult['latitude'];
+        _longitude = platformResult['longitude'];
+        _isLoading = false;
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Location set to ${name ?? "selected location"}'),
+        ),
+      );
+    } on PlatformException catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to set location: ${e.message}';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -346,6 +396,19 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: _isLoading ? null : _refreshLocation,
               icon: const Icon(Icons.refresh),
               label: const Text('Refresh from GPS'),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Search location button
+            ElevatedButton.icon(
+              onPressed: _isLoading ? null : _searchLocation,
+              icon: const Icon(Icons.search),
+              label: const Text('Search Location'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF262626),
+                foregroundColor: const Color(0xFFFFAE00),
+              ),
             ),
 
             const SizedBox(height: 24),
