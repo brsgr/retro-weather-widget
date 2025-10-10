@@ -1,0 +1,64 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circular black background -->
+  <circle cx="256" cy="256" r="256" fill="#000000"/>
+
+  <!-- Pixelated partly cloudy icon - 32x32 grid, 16px per pixel -->
+  <!-- Using the same design as the PNG generator -->
+
+  <!-- Sun rays (amber #FFAE00) -->
+  <!-- Top ray -->
+  <rect x="160" y="80" width="16" height="32" fill="#FFAE00"/>
+  <!-- Bottom ray -->
+  <rect x="160" y="176" width="16" height="32" fill="#FFAE00"/>
+  <!-- Left ray -->
+  <rect x="64" y="128" width="32" height="16" fill="#FFAE00"/>
+  <!-- Right ray -->
+  <rect x="176" y="128" width="32" height="16" fill="#FFAE00"/>
+  <!-- Diagonal rays -->
+  <rect x="112" y="96" width="16" height="16" fill="#FFAE00"/>
+  <rect x="192" y="96" width="16" height="16" fill="#FFAE00"/>
+  <rect x="112" y="160" width="16" height="16" fill="#FFAE00"/>
+  <rect x="192" y="160" width="16" height="16" fill="#FFAE00"/>
+
+  <!-- Sun core (gold #FFD700 with light center #FFF4CC) -->
+  <rect x="144" y="112" width="16" height="16" fill="#FFD700"/>
+  <rect x="160" y="112" width="16" height="16" fill="#FFD700"/>
+  <rect x="176" y="112" width="16" height="16" fill="#FFD700"/>
+  <rect x="144" y="128" width="16" height="16" fill="#FFD700"/>
+  <rect x="160" y="128" width="16" height="16" fill="#FFF4CC"/>
+  <rect x="176" y="128" width="16" height="16" fill="#FFD700"/>
+  <rect x="144" y="144" width="16" height="16" fill="#FFD700"/>
+  <rect x="160" y="144" width="16" height="16" fill="#FFD700"/>
+  <rect x="176" y="144" width="16" height="16" fill="#FFD700"/>
+
+  <!-- Cloud (white #FFFFFF with light gray #E0E0E0 and gray #C0C0C0 shading) -->
+  <!-- Top of cloud -->
+  <rect x="224" y="208" width="96" height="16" fill="#FFFFFF"/>
+  <rect x="208" y="224" width="128" height="16" fill="#FFFFFF"/>
+  <rect x="192" y="240" width="160" height="16" fill="#FFFFFF"/>
+
+  <!-- Middle of cloud -->
+  <rect x="176" y="256" width="192" height="16" fill="#FFFFFF"/>
+  <rect x="176" y="272" width="192" height="16" fill="#FFFFFF"/>
+  <rect x="176" y="288" width="208" height="16" fill="#FFFFFF"/>
+
+  <!-- Bottom of cloud (wider) -->
+  <rect x="176" y="304" width="224" height="16" fill="#FFFFFF"/>
+  <rect x="192" y="320" width="208" height="16" fill="#FFFFFF"/>
+  <rect x="208" y="336" width="176" height="16" fill="#FFFFFF"/>
+
+  <!-- Cloud shading (light gray) -->
+  <rect x="320" y="240" width="32" height="16" fill="#E0E0E0"/>
+  <rect x="336" y="256" width="32" height="16" fill="#E0E0E0"/>
+  <rect x="336" y="272" width="32" height="16" fill="#E0E0E0"/>
+  <rect x="352" y="288" width="32" height="16" fill="#E0E0E0"/>
+  <rect x="368" y="304" width="32" height="16" fill="#E0E0E0"/>
+  <rect x="368" y="320" width="32" height="16" fill="#E0E0E0"/>
+  <rect x="352" y="336" width="32" height="16" fill="#E0E0E0"/>
+
+  <!-- Cloud darker shading (gray) -->
+  <rect x="352" y="320" width="16" height="16" fill="#C0C0C0"/>
+  <rect x="368" y="320" width="16" height="16" fill="#C0C0C0"/>
+  <rect x="336" y="336" width="16" height="16" fill="#C0C0C0"/>
+  <rect x="352" y="336" width="16" height="16" fill="#C0C0C0"/>
+</svg>

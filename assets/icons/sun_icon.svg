@@ -1,0 +1,70 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Black background -->
+  <rect width="512" height="512" fill="#000000"/>
+
+  <!-- Pixel art sun in amber/golden color -->
+  <!-- Using 32px grid (512/16 = 32px per pixel block) -->
+
+  <!-- Top ray -->
+  <rect x="224" y="32" width="64" height="32" fill="#FFAE00"/>
+
+  <!-- Top-left ray -->
+  <rect x="96" y="96" width="32" height="32" fill="#FFAE00"/>
+  <rect x="128" y="128" width="32" height="32" fill="#FFAE00"/>
+
+  <!-- Top-right ray -->
+  <rect x="384" y="96" width="32" height="32" fill="#FFAE00"/>
+  <rect x="352" y="128" width="32" height="32" fill="#FFAE00"/>
+
+  <!-- Left ray -->
+  <rect x="32" y="224" width="32" height="64" fill="#FFAE00"/>
+
+  <!-- Right ray -->
+  <rect x="448" y="224" width="32" height="64" fill="#FFAE00"/>
+
+  <!-- Bottom-left ray -->
+  <rect x="96" y="384" width="32" height="32" fill="#FFAE00"/>
+  <rect x="128" y="352" width="32" height="32" fill="#FFAE00"/>
+
+  <!-- Bottom-right ray -->
+  <rect x="384" y="384" width="32" height="32" fill="#FFAE00"/>
+  <rect x="352" y="352" width="32" height="32" fill="#FFAE00"/>
+
+  <!-- Bottom ray -->
+  <rect x="224" y="448" width="64" height="32" fill="#FFAE00"/>
+
+  <!-- Sun core - outer layer -->
+  <rect x="192" y="160" width="32" height="32" fill="#FFAE00"/>
+  <rect x="224" y="128" width="64" height="32" fill="#FFAE00"/>
+  <rect x="288" y="160" width="32" height="32" fill="#FFAE00"/>
+
+  <rect x="160" y="192" width="32" height="32" fill="#FFAE00"/>
+  <rect x="320" y="192" width="32" height="32" fill="#FFAE00"/>
+
+  <rect x="160" y="224" width="32" height="64" fill="#FFAE00"/>
+  <rect x="320" y="224" width="32" height="64" fill="#FFAE00"/>
+
+  <rect x="160" y="288" width="32" height="32" fill="#FFAE00"/>
+  <rect x="320" y="288" width="32" height="32" fill="#FFAE00"/>
+
+  <rect x="192" y="320" width="32" height="32" fill="#FFAE00"/>
+  <rect x="224" y="352" width="64" height="32" fill="#FFAE00"/>
+  <rect x="288" y="320" width="32" height="32" fill="#FFAE00"/>
+
+  <!-- Sun core - middle layer (brighter) -->
+  <rect x="192" y="192" width="32" height="32" fill="#FFD700"/>
+  <rect x="224" y="160" width="64" height="32" fill="#FFD700"/>
+  <rect x="288" y="192" width="32" height="32" fill="#FFD700"/>
+
+  <rect x="192" y="224" width="32" height="64" fill="#FFD700"/>
+  <rect x="288" y="224" width="32" height="64" fill="#FFD700"/>
+
+  <rect x="192" y="288" width="32" height="32" fill="#FFD700"/>
+  <rect x="224" y="320" width="64" height="32" fill="#FFD700"/>
+  <rect x="288" y="288" width="32" height="32" fill="#FFD700"/>
+
+  <!-- Sun core - center (brightest) -->
+  <rect x="224" y="192" width="64" height="32" fill="#FFF4CC"/>
+  <rect x="224" y="224" width="64" height="64" fill="#FFF4CC"/>
+  <rect x="224" y="288" width="64" height="32" fill="#FFF4CC"/>
+</svg>
