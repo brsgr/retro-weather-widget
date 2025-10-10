@@ -13,7 +13,136 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Weather Widget',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF000000),
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFFFFAE00),
+          secondary: Color(0xFFFFAE00),
+          surface: Color(0xFF000000),
+          error: Color(0xFFFF5555),
+          onPrimary: Color(0xFF000000),
+          onSecondary: Color(0xFF000000),
+          onSurface: Color(0xFFFFFFFF),
+          onError: Color(0xFFFFFFFF),
+        ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFF262626),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: const BorderSide(color: Color(0xFF262626)),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFFFAE00),
+            foregroundColor: const Color(0xFF000000),
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            textStyle: const TextStyle(fontFamily: 'CustomFont', fontSize: 16),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF262626),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFF262626)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFF262626)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFFFFAE00), width: 2),
+          ),
+          labelStyle: const TextStyle(
+            color: Color(0xFFFFFFFF),
+            fontFamily: 'CustomFont',
+          ),
+          hintStyle: const TextStyle(
+            color: Color(0xFF888888),
+            fontFamily: 'CustomFont',
+          ),
+        ),
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          displayMedium: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          displaySmall: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          headlineLarge: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          headlineMedium: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          headlineSmall: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          titleLarge: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          titleMedium: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          titleSmall: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          bodyLarge: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          bodyMedium: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          bodySmall: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          labelLarge: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          labelMedium: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+          labelSmall: TextStyle(
+            fontFamily: 'CustomFont',
+            color: Color(0xFFFFFFFF),
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Color(0xFFFFAE00)),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF000000),
+          foregroundColor: Color(0xFFFFFFFF),
+          elevation: 0,
+          titleTextStyle: TextStyle(
+            fontFamily: 'CustomFont',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFFFFFFFF),
+          ),
+        ),
       ),
       home: const MyHomePage(),
     );
@@ -166,10 +295,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Weather Widget'),
-      ),
+      appBar: AppBar(title: const Text('Weather Widget')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -277,18 +403,21 @@ class _MyHomePageState extends State<MyHomePage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
+                  color: const Color(0xFF331111),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red.shade200),
+                  border: Border.all(color: const Color(0xFFFF5555)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.error_outline, color: Colors.red.shade700),
+                    const Icon(Icons.error_outline, color: Color(0xFFFF5555)),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _errorMessage!,
-                        style: TextStyle(color: Colors.red.shade700),
+                        style: const TextStyle(
+                          color: Color(0xFFFF5555),
+                          fontFamily: 'CustomFont',
+                        ),
                       ),
                     ),
                   ],

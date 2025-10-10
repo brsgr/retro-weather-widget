@@ -87,3 +87,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  fonts:
+    - family: CustomFont
+      fonts:
+        - asset: assets/fonts/custom_font.ttf
