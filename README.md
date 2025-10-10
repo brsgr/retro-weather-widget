@@ -56,10 +56,10 @@ Location permissions are used exclusively to determine your coordinates for weat
    ```bash
    # List available emulators
    flutter emulators
-   
+
    # Launch emulator
    flutter emulators --launch <emulator-id>
-   
+
    # Or check connected devices
    flutter devices
    ```
@@ -144,7 +144,3 @@ The APK will be located at:
 ```
 build/app/outputs/flutter-apk/app-release.apk
 ```
-
-## License
-
-[Add your license here]
