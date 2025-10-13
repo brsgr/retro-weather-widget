@@ -91,6 +91,18 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
         }
     }
 
+    fun updateAllWidgets(
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            appWidgetIds: IntArray,
+            weatherData: WeatherData,
+            location: Coordinates
+    ) {
+        for (appWidgetId in appWidgetIds) {
+            updateWidgetWithWeather(context, appWidgetManager, appWidgetId, weatherData, location)
+        }
+    }
+
     private fun updateWidgetWithWeather(
             context: Context,
             appWidgetManager: AppWidgetManager,

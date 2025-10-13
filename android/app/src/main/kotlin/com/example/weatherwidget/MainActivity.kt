@@ -9,9 +9,13 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -94,6 +98,32 @@ class MainActivity : FlutterActivity() {
 
         // Request location permissions on app start
         requestLocationPermissions()
+
+        // Schedule periodic weather updates using WorkManager
+        scheduleWeatherUpdates()
+    }
+
+    private fun scheduleWeatherUpdates() {
+        // Create a periodic work request that runs every 30 minutes
+        val workRequest =
+                PeriodicWorkRequestBuilder<WeatherUpdateWorker>(
+                                30,
+                                TimeUnit.MINUTES,
+                                5,
+                                TimeUnit.MINUTES // Flex interval - allows Android to run it within
+                                // a 5-minute window
+                                )
+                        .build()
+
+        // Enqueue the work request (replace existing if any)
+        WorkManager.getInstance(applicationContext)
+                .enqueueUniquePeriodicWork(
+                        "weather_update_work",
+                        ExistingPeriodicWorkPolicy.KEEP, // Keep existing if already scheduled
+                        workRequest
+                )
+
+        android.util.Log.d("MainActivity", "Weather update work scheduled")
     }
 
     private fun requestLocationPermissions() {
