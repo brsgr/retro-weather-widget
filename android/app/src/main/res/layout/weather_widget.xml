@@ -1,30 +1,47 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="#00000000"
     android:padding="8dp"
+    android:background="#00000000"
 >
 
-    <ImageView
-        android:id="@+id/temperature_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="Temperature"
-        android:scaleType="fitCenter"
-    />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+    >
+
+        <ImageView
+            android:id="@+id/temperature_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Temperature"
+            android:scaleType="fitCenter"
+        />
+
+        <ImageView
+            android:id="@+id/conditions_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Weather conditions"
+            android:scaleType="fitCenter"
+            android:layout_marginTop="4dp"
+        />
+
+    </LinearLayout>
 
     <ImageView
-        android:id="@+id/conditions_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="Weather conditions"
+        android:id="@+id/warning_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="top|end"
+        android:contentDescription="Connection warning"
         android:scaleType="fitCenter"
-        android:layout_marginTop="4dp"
+        android:visibility="gone"
     />
 
-</LinearLayout>
+</FrameLayout>
