@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.View
 import android.widget.RemoteViews
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,6 +72,9 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
                         "Weather fetched: ${weatherData.temperature}°F, ${WeatherService.getWeatherDescription(weatherData.weatherCode)}"
                 )
 
+                // Cache the weather data for offline fallback
+                saveWeatherData(context, weatherData)
+
                 // Update all widgets
                 for (appWidgetId in appWidgetIds) {
                     updateWidgetWithWeather(
@@ -83,9 +87,26 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
                 }
             } else {
                 Log.e(TAG, "Failed to fetch weather")
-                // Update widgets with error message
-                for (appWidgetId in appWidgetIds) {
-                    updateWidgetWithError(context, appWidgetManager, appWidgetId, "Weather error")
+
+                // Try to use cached weather data instead of showing error
+                val cachedWeather = getCachedWeatherData(context)
+                if (cachedWeather != null) {
+                    Log.d(TAG, "Using cached weather data: ${cachedWeather.temperature}°F")
+                    for (appWidgetId in appWidgetIds) {
+                        updateWidgetWithWeather(
+                                context,
+                                appWidgetManager,
+                                appWidgetId,
+                                cachedWeather,
+                                location,
+                                showWarning = true
+                        )
+                    }
+                } else {
+                    // No cached data available, show error
+                    for (appWidgetId in appWidgetIds) {
+                        updateWidgetWithError(context, appWidgetManager, appWidgetId, "Weather error")
+                    }
                 }
             }
         }
@@ -96,10 +117,11 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
             appWidgetManager: AppWidgetManager,
             appWidgetIds: IntArray,
             weatherData: WeatherData,
-            location: Coordinates
+            location: Coordinates,
+            showWarning: Boolean = false
     ) {
         for (appWidgetId in appWidgetIds) {
-            updateWidgetWithWeather(context, appWidgetManager, appWidgetId, weatherData, location)
+            updateWidgetWithWeather(context, appWidgetManager, appWidgetId, weatherData, location, showWarning)
         }
     }
 
@@ -108,7 +130,8 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int,
             weatherData: WeatherData,
-            location: Coordinates
+            location: Coordinates,
+            showWarning: Boolean = false
     ) {
         val views = RemoteViews(context.packageName, R.layout.weather_widget)
 
@@ -134,6 +157,15 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
 
         views.setImageViewBitmap(R.id.temperature_text, tempBitmap)
         views.setImageViewBitmap(R.id.conditions_text, conditionsBitmap)
+
+        // Show or hide the warning icon
+        if (showWarning) {
+            val warningBitmap = TextBitmapHelper.createWarningBitmap(48)
+            views.setImageViewBitmap(R.id.warning_icon, warningBitmap)
+            views.setViewVisibility(R.id.warning_icon, View.VISIBLE)
+        } else {
+            views.setViewVisibility(R.id.warning_icon, View.GONE)
+        }
 
         // Set up click listener to open Google Weather
         val pendingIntent = createGoogleWeatherIntent(context, location)
@@ -169,6 +201,7 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
 
         views.setImageViewBitmap(R.id.temperature_text, errorBitmap)
         views.setImageViewBitmap(R.id.conditions_text, messageBitmap)
+        views.setViewVisibility(R.id.warning_icon, View.GONE)
 
         // Try to get saved location, or use default
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -229,10 +262,32 @@ class WeatherWidgetReceiver : AppWidgetProvider() {
         }
     }
 
+    private fun saveWeatherData(context: Context, weatherData: WeatherData) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().apply {
+            putFloat(PREF_CACHED_TEMP, weatherData.temperature.toFloat())
+            putInt(PREF_CACHED_WEATHER_CODE, weatherData.weatherCode)
+            apply()
+        }
+    }
+
+    private fun getCachedWeatherData(context: Context): WeatherData? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val temp = prefs.getFloat(PREF_CACHED_TEMP, Float.NaN)
+        val code = prefs.getInt(PREF_CACHED_WEATHER_CODE, -1)
+        return if (!temp.isNaN() && code != -1) {
+            WeatherData(temp.toDouble(), code)
+        } else {
+            null
+        }
+    }
+
     companion object {
         private const val TAG = "WeatherWidget"
         private const val PREFS_NAME = "WeatherWidgetPrefs"
         private const val PREF_LAST_LAT = "last_latitude"
         private const val PREF_LAST_LON = "last_longitude"
+        private const val PREF_CACHED_TEMP = "cached_temperature"
+        private const val PREF_CACHED_WEATHER_CODE = "cached_weather_code"
     }
 }

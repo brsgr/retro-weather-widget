@@ -65,7 +65,14 @@ class WeatherUpdateWorker(context: Context, params: WorkerParameters) :
                         "Weather fetched: ${weatherData.temperature}°F, ${WeatherService.getWeatherDescription(weatherData.weatherCode)}"
                 )
 
-                // Trigger widget update via broadcast
+                // Cache the weather data for offline fallback
+                prefs.edit().apply {
+                    putFloat(PREF_CACHED_TEMP, weatherData.temperature.toFloat())
+                    putInt(PREF_CACHED_WEATHER_CODE, weatherData.weatherCode)
+                    apply()
+                }
+
+                // Trigger widget update
                 val receiver = WeatherWidgetReceiver()
                 receiver.updateAllWidgets(
                         applicationContext,
@@ -78,6 +85,25 @@ class WeatherUpdateWorker(context: Context, params: WorkerParameters) :
                 Result.success()
             } else {
                 Log.e(TAG, "Failed to fetch weather")
+
+                // Try to use cached weather data instead of just retrying
+                val cachedTemp = prefs.getFloat(PREF_CACHED_TEMP, Float.NaN)
+                val cachedCode = prefs.getInt(PREF_CACHED_WEATHER_CODE, -1)
+
+                if (!cachedTemp.isNaN() && cachedCode != -1) {
+                    Log.d(TAG, "Using cached weather data: ${cachedTemp}°F")
+                    val cachedWeather = WeatherData(cachedTemp.toDouble(), cachedCode)
+                    val receiver = WeatherWidgetReceiver()
+                    receiver.updateAllWidgets(
+                            applicationContext,
+                            appWidgetManager,
+                            appWidgetIds,
+                            cachedWeather,
+                            location,
+                            showWarning = true
+                    )
+                }
+
                 Result.retry()
             }
         } catch (e: Exception) {
@@ -91,5 +117,7 @@ class WeatherUpdateWorker(context: Context, params: WorkerParameters) :
         private const val PREFS_NAME = "WeatherWidgetPrefs"
         private const val PREF_LAST_LAT = "last_latitude"
         private const val PREF_LAST_LON = "last_longitude"
+        private const val PREF_CACHED_TEMP = "cached_temperature"
+        private const val PREF_CACHED_WEATHER_CODE = "cached_weather_code"
     }
 }
