@@ -4,7 +4,12 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.util.Log
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 
 class WeatherUpdateWorker(context: Context, params: WorkerParameters) :
@@ -104,7 +109,24 @@ class WeatherUpdateWorker(context: Context, params: WorkerParameters) :
                     )
                 }
 
-                Result.retry()
+                // Schedule a one-shot update that fires as soon as network is available.
+                // This ensures the warning symbol is cleared immediately on reconnect
+                // rather than waiting for the next 30-minute periodic poll.
+                val constraints = Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
+                val reconnectWork = OneTimeWorkRequestBuilder<WeatherUpdateWorker>()
+                        .setConstraints(constraints)
+                        .build()
+                WorkManager.getInstance(applicationContext)
+                        .enqueueUniqueWork(
+                                RECONNECT_WORK_NAME,
+                                ExistingWorkPolicy.REPLACE,
+                                reconnectWork
+                        )
+                Log.d(TAG, "Scheduled reconnect work for when network is available")
+
+                Result.success()
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in WeatherUpdateWorker", e)
@@ -119,5 +141,6 @@ class WeatherUpdateWorker(context: Context, params: WorkerParameters) :
         private const val PREF_LAST_LON = "last_longitude"
         private const val PREF_CACHED_TEMP = "cached_temperature"
         private const val PREF_CACHED_WEATHER_CODE = "cached_weather_code"
+        private const val RECONNECT_WORK_NAME = "weather_reconnect_work"
     }
 }
