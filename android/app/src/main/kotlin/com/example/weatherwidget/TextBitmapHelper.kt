@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.Typeface
 import androidx.core.content.res.ResourcesCompat
 
@@ -57,34 +56,47 @@ object TextBitmapHelper {
     }
 
     fun createWarningBitmap(sizePx: Int): Bitmap {
-        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
+        // Draw at low resolution and scale up for a pixelated retro look
+        val pixelSize = 12
+        val smallBitmap = Bitmap.createBitmap(pixelSize, pixelSize, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(smallBitmap)
 
-        val padding = sizePx * 0.05f
+        val amber = 0xFFFFAA00.toInt()
+        val dark = 0xFF222222.toInt()
 
-        // Draw yellow/amber triangle
-        val trianglePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = 0xFFFFAA00.toInt()
-            style = Paint.Style.FILL
+        // Pixel art warning triangle with exclamation mark
+        val pixels = arrayOf(
+            "     YY     ",
+            "     YY     ",
+            "    YYYY    ",
+            "    YDDY    ",
+            "   YYDDYY   ",
+            "   YYDDYY   ",
+            "  YYYDDYYY  ",
+            "  YYY  YYY  ",
+            " YYYYDDYYYY ",
+            " YYYYYYYYYY ",
+            "YYYYYYYYYYYY",
+            "YYYYYYYYYYYY"
+        )
+
+        val paint = Paint().apply { isAntiAlias = false }
+        for (y in pixels.indices) {
+            for (x in pixels[y].indices) {
+                when (pixels[y][x]) {
+                    'Y' -> {
+                        paint.color = amber
+                        canvas.drawRect(x.toFloat(), y.toFloat(), x + 1f, y + 1f, paint)
+                    }
+                    'D' -> {
+                        paint.color = dark
+                        canvas.drawRect(x.toFloat(), y.toFloat(), x + 1f, y + 1f, paint)
+                    }
+                }
+            }
         }
-        val path = Path().apply {
-            moveTo(sizePx / 2f, padding)
-            lineTo(sizePx - padding, sizePx - padding)
-            lineTo(padding, sizePx - padding)
-            close()
-        }
-        canvas.drawPath(path, trianglePaint)
 
-        // Draw dark exclamation mark
-        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = 0xFF222222.toInt()
-            textSize = sizePx * 0.55f
-            textAlign = Paint.Align.CENTER
-            typeface = Typeface.DEFAULT_BOLD
-        }
-        val textY = sizePx * 0.82f
-        canvas.drawText("!", sizePx / 2f, textY, textPaint)
-
-        return bitmap
+        // Scale up with nearest-neighbor interpolation for crisp pixel edges
+        return Bitmap.createScaledBitmap(smallBitmap, sizePx, sizePx, false)
     }
 }
